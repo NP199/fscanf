@@ -7,4 +7,5 @@ In der dritten Spalte steht der Vorname
 In der vierten Spalte steht das Geburtsjahr
 
 Die Datei Darf naximal 21 Einträge erhalten.
-Diese werden am Anfang vom Programm in der Variable DB_SIZE festgelegt.
+Diese werden am Anfang vom Programm in der Variable 'DB_SIZE' festgelegt.
+clang-format-12 wurde mit der .clang-format genutzt.

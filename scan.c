@@ -1,25 +1,24 @@
 /**
-*	Projekt geforked von https://github.com/bjoekeldude/fscanf
-*/
+ *	Projekt geforked von https://github.com/bjoekeldude/fscanf
+ */
 
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 
-#include<string.h>
-#include<stdlib.h>
-#include<stdio.h>
-#include<unistd.h>
+char const* const VERSIONSNR = "0.1.2";
+int const DB_SIZE = 20;
 
-const char VERSIONSNR[] = "0.2.1";
-
-const int DB_SIZE = 20;
-
-typedef struct person_t{
-	int personalnummer;
-	char nachname[20];
-	char vorname[20];
-	int geburtsjahr;
-	struct person_t *next;
-} person_t;
-
+struct person
+{
+    int  personalnummer;
+    char nachname[20];
+    char vorname[20];
+    int  geburtsjahr;
+};
+typedef struct person person_t;
 
 person_t *next = NULL;	
 person_t *begin = NULL;
@@ -63,65 +62,80 @@ void init_list()
 	}
 }
 
-void readcsv(char *datei)
+void readcsv(char const* const datei)
 {
-	FILE *filepointer = NULL;
-	int zaehler = 0;
-	//check for empty file
-	if(NULL == (filepointer = fopen(datei, "r")))
-	{
-		fprintf(stderr, "Couldnt open file '%s'\n", datei);
-		exit(2);
-	}
-	person_t database[DB_SIZE];
-	while((fscanf(filepointer, "%d,%[^,],%[^,],%d", &database[zaehler].personalnummer,
-			 database[zaehler].nachname, database[zaehler].vorname,
-			 &database[zaehler].geburtsjahr))!= EOF)
-		{		
-			printf("%d, %s, %s, %d \n", database[zaehler].personalnummer, 
-			database[zaehler].nachname, database[zaehler].vorname,
-			database[zaehler].geburtsjahr);
-			zaehler++;
-		}
-	//check if file closed correctly	
-	if(fclose(filepointer) == EOF)
-	{
-		fprintf(stderr, "Fehler beim schließen der Datei! \n");
-		exit(2);
-	}
+    FILE* filepointer = NULL;
+    int   zaehler     = 0;
+
+    filepointer = fopen(datei, "r");
+    if(NULL == filepointer)
+    {
+        fprintf(stderr, "Couldnt open file '%s'\n", datei);
+        exit(2);
+    }
+    person_t database[DB_SIZE];
+    while(fscanf(filepointer,
+                 "%d,%[^,],%[^,],%d",
+                 &database[zaehler].personalnummer,
+                 database[zaehler].nachname,
+                 database[zaehler].vorname,
+                 &database[zaehler].geburtsjahr)
+          != EOF)
+    {
+        printf("%d, %s, %s, %d \n",
+               database[zaehler].personalnummer,
+               database[zaehler].nachname,
+               database[zaehler].vorname,
+               database[zaehler].geburtsjahr);
+        zaehler++;
+        if(zaehler == DB_SIZE)
+        {
+            fprintf(stderr, "Datenbank voll! \n");
+            break;
+        }
+    }
+    // check if file closed correctly
+    if(fclose(filepointer) == EOF)
+    {
+        fprintf(stderr, "Fehler beim schließen der Datei! \n");
+        exit(2);
+    }
 }
 
 
 int main(int argc, char* argv[])
-{ 
 	init_list();
-	
-	//Usage of the argc and argv values
-	if(argc < 2)
-	{
-		fprintf(stderr, "No option recognized. Wrong Usage. Please try -h\n");
-	}
-	
-	int option;
-	while((option = getopt(argc, argv, "hvf:"))!=-1)
-	{
-		switch(option)
-		{
-			case 'h':
-				printf("Bitte -f nutzen um einen File-Path anzugeben\n");
-				exit(0);
-			case 'v':
-				printf("Version %s\n", VERSIONSNR);
-				exit(0);
-			case 'f':
-				readcsv(optarg);
-				break;
-			case '?':
-				fprintf(stderr ,"Please try -h\n");
-				exit(1);
-		}
-	}
+{
+    if(argc < 2)
+    {
+        fprintf(stderr, "No option recognized. Wrong Usage. Please try -h\n");
+    }
 
-	return 0;
+    while(true)
+    {
+        int option = getopt(argc, argv, "hvf:");
+        switch(option)
+        {
+        case 'h':
+            printf("Bitte -f nutzen um einen File-Path anzugeben\n");
+            exit(0);
+
+        case 'v':
+            printf("Version %s\n", VERSIONSNR);
+            exit(0);
+
+        case 'f':
+            readcsv(optarg);
+            break;
+
+        case '?':
+            fprintf(stderr, "Please try -h\n");
+            exit(1);
+
+        case -1:
+            exit(0);
+        }
+    }
+
+    return 0;
 }
-
