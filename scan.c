@@ -8,7 +8,7 @@
 #include<stdio.h>
 #include<unistd.h>
 
-const char VERSIONSNR[] = "0.1.2";
+const char VERSIONSNR[] = "0.2.1";
 
 const int DB_SIZE = 20;
 
@@ -17,7 +17,51 @@ typedef struct person_t{
 	char nachname[20];
 	char vorname[20];
 	int geburtsjahr;
+	struct person_t *next;
 } person_t;
+
+
+person_t *next = NULL;	
+person_t *begin = NULL;
+
+void init_list()
+{
+	person_t *zeiger;
+	printf("zeiger:%p begin:%p, next:%p\n",(void *)zeiger,(void *)begin, (void *)zeiger->next );
+
+	if(begin == NULL)
+	{
+		if((begin = malloc(sizeof(struct person_t))) == NULL)
+		{
+			fprintf(stderr, "Kein Speicherplatz vorhanden für den Anfang!\n");
+			exit(2);
+		}
+		
+		printf("zeiger:%p begin:%p, next:%p\n",(void *)zeiger,(void *)begin, (void *)zeiger->next );
+
+		zeiger = begin;
+	
+		printf("zeiger:%p begin:%p, next:%p\n",(void *)zeiger,(void *)begin, (void *)zeiger->next );
+		while(zeiger->next != NULL)
+		{
+			zeiger =zeiger->next;
+		}
+		if((zeiger->next = malloc(sizeof(struct person_t))) == NULL)
+		{
+			fprintf(stderr, "Kein Speicherplatz vorhanden für den naechsten Zeiger!\n");
+			exit(2);
+		}
+
+		printf("zeiger:%p begin:%p, next:%p\n",(void *)zeiger,(void *)begin, (void *)zeiger->next );
+		zeiger = zeiger->next;		
+		printf("zeiger:%p begin:%p, next:%p\n",(void *)zeiger,(void *)begin, (void *)zeiger->next );
+	}
+	else
+	{
+		fprintf(stderr ,"erster Zeiger bereits vorhanden!");
+		exit(2);
+	}
+}
 
 void readcsv(char *datei)
 {
@@ -47,15 +91,18 @@ void readcsv(char *datei)
 	}
 }
 
+
 int main(int argc, char* argv[])
-{
+{ 
+	init_list();
+	
+	//Usage of the argc and argv values
 	if(argc < 2)
 	{
 		fprintf(stderr, "No option recognized. Wrong Usage. Please try -h\n");
 	}
 	
 	int option;
-
 	while((option = getopt(argc, argv, "hvf:"))!=-1)
 	{
 		switch(option)
