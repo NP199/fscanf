@@ -1,5 +1,5 @@
 /**
- *	Projekt geforked von https://github.com/bjoekeldude/fscanf
+ *	Projekt geforked von https://github.com/np199/fscanf
  */
 
 #include <stdbool.h>
@@ -14,10 +14,16 @@ int const DB_SIZE = 20;
 
 struct person
 {
-    int  personalnummer;
-    char nachname[20];
-    char vorname[20];
-    int  geburtsjahr;
+    char name[30];
+    char birthday[11];
+    char deathday[11];
+    char gender[2];
+    char birthplace[30];
+    char partner[30];
+    char siblingName[30];
+    char childName[30];
+    struct person sibling;
+    struct person child;
 };
 typedef struct person person_t;
 
@@ -34,18 +40,26 @@ void readcsv(char const* const datei)
     }
     person_t database[DB_SIZE];
     while(fscanf(filepointer,
-                 "%d,%[^,],%[^,],%d",
-                 &database[zaehler].personalnummer,
-                 database[zaehler].nachname,
-                 database[zaehler].vorname,
-                 &database[zaehler].geburtsjahr)
-          != EOF)
+                 "%[^,],%[^,],%[^,],%[^,],%[^,],%[^,],%[^,],%s",
+                 &database[zaehler].name,
+                 database[zaehler].birthday,
+                 database[zaehler].deathday,
+                 &database[zaehler].gender,
+		 &database[zaehler].birthplace,
+		 &database[zaehler].partner,
+		 &database[zaehler].siblingName,
+		 &database[zaehler].childName)
+          != EOF)    
     {
-        printf("%d, %s, %s, %d \n",
-               database[zaehler].personalnummer,
-               database[zaehler].nachname,
-               database[zaehler].vorname,
-               database[zaehler].geburtsjahr);
+        printf("%s, %s, %s, %s, %s, %s, %s, %s\n",
+               database[zaehler].name,
+               database[zaehler].birthday,
+               database[zaehler].deathday,
+               database[zaehler].gender,
+	       database[zaehler].birthplace,
+	       database[zaehler].partner,
+	       database[zaehler].siblingName,
+	       database[zaehler].childName);
         zaehler++;
         if(zaehler == DB_SIZE)
         {
